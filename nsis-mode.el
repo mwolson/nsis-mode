@@ -1,4 +1,4 @@
-;;; nsis-mode.el --- NSIS-mode
+;;; nsis-mode.el --- NSIS-mode  -*- lexical-binding: t -*-
 ;;
 ;; Filename: nsis-mode.el
 ;; Description: NSIS mode
@@ -912,6 +912,8 @@
 ;; Font Lock Keywords
 ;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+(defvar font-lock-beg)
+
 (defun nsis-font-lock-extend-region-continue ()
   "Extend region for multi-line matches, and multi-line comments."
   (interactive)
@@ -993,7 +995,7 @@
               ;; Hidden
               (add-text-properties (match-beginning 4) (match-end 4)
                                    '(face nsis-font-lock-italic-string-face)))))
-          (symbol-value 'ret))
+          ret)
         )
     (error
      (message "font-lock-error `nsis-font-lock-section-quote': %s" (error-message-string error))
@@ -1026,7 +1028,7 @@
               (if (match-string 4)
                   (add-text-properties (match-beginning 4) (match-end 4)
                                        '(face font-lock-variable-name-face))))))
-          (symbol-value 'ret))
+          ret)
         )
     (error
      (message "Font Lock error in `nsis-font-lock-section-no-quote': %s" (error-message-string error))
@@ -1041,7 +1043,7 @@
           (when (and ret (not (memq (get-text-property (point) 'face) '(font-lock-comment-face font-lock-string-face))))
             (add-text-properties (match-beginning 1) (match-end 1)
                                  '(face nsis-font-lock-italic-type-face)))
-          (symbol-value 'ret)))
+          ret))
     (error
      (message "Font Lock Error in `nsis-font-lock-unknown-switches': %s" (error-message-string error))
      nil)))
@@ -1077,7 +1079,7 @@
        (message "Font Lock Error `nsis-font-lock-no-comment': %s" (error-message-string error))
        (setq ret nil))
       )
-    (symbol-value 'ret)))
+    ret))
 
 (defun nsis-font-lock-multi-line-string (limit)
   "Font lock for multi-line string.  Make sure the string is not in a comment."
@@ -1287,6 +1289,10 @@ Just return STR-TO-EMULATE)"
 ;; Yasnippet support
 ;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+(defvar yas-moving-away-p)
+(defvar yas-modified-p)
+(defvar yas-text)
+
 (defun nsis-yas-desc (secn descn)
   "Yasnippet check for description update.  For use with `nsis-yas-description'."
   (unless (or yas-moving-away-p yas-modified-p)
@@ -1350,7 +1356,7 @@ Just return STR-TO-EMULATE)"
     (while (string-match "_$" ret)
       (setq ret (replace-match "" nil t ret)))
     (setq ret (downcase ret))
-    (symbol-value 'ret)))
+    ret))
 
 (defun nsis-yas-hidden-bold ()
   "Yasnippet section transform."
@@ -1367,7 +1373,7 @@ Just return STR-TO-EMULATE)"
         )
        (t
         (setq ret ""))))
-    (symbol-value 'ret)))
+    ret))
 (defun yas-munge-callback-key-1 (val)
   "Create first key based on callback."
   (let ((x val))
@@ -1378,9 +1384,8 @@ Just return STR-TO-EMULATE)"
     (while (string-match "[.]" x)
       (setq x (replace-match "" nil t x)))
     (setq x (downcase x))
-    (symbol-value 'x)
-    )
-  )
+    x))
+
 (defun yas-munge-callback-name (val)
   "Change Callback names to human-readable names."
   (let ((x val)
@@ -1402,7 +1407,7 @@ Just return STR-TO-EMULATE)"
     (when (string-match "G U I" x)
       (setq x (replace-match "GUI" t t x)))
     (setq x (concat x uninstall))
-    (symbol-value 'x)))
+    x))
 
 ;; Left off at Section Management
 
@@ -1750,10 +1755,10 @@ System::Call 'kernel32::GetModuleFileNameA(i 0, t .R0, i 1024) i r1'
                        yas-snippet-dirs
                      ))
           (debug-on-error t)
-          added-snippets
-          file
-          atfile
-          snippet-list
+          _added-snippets
+          _file
+          _atfile
+          _snippet-list
           )
       (setq new-dir (concat new-dir "/nsis-mode/"))
       (unless (file-exists-p new-dir)
@@ -1900,7 +1905,7 @@ Run run the NSI output then."
         (when (or (re-search-forward "^[ \t]*OutFile[ \t]*\"\\(.*?\\)\"" nil t)
                   (re-search-forward "^[ \t]*OutFile[ \t]*\\(\\[^ \t]+\\)" nil t))
           (setq outfile (w32-short-file-name (concat dir "/" (match-string 1))))))
-      (symbol-value 'outfile))))
+      outfile)))
 
 (defun nsis-run-file (&optional out-file)
   "Run output file, possibly compiling if necessary."
@@ -1910,7 +1915,7 @@ Run run the NSI output then."
       (start-process "*nsis*" "*nsis*"
                      out))))
 
-(defun nsis-finish-compile-run (&rest ignore)
+(defun nsis-finish-compile-run (&rest _ignore)
   "Run output after finished Nsi Compilation."
   (with-current-buffer "*nsis*"
     (forward-line -1)
@@ -1921,7 +1926,7 @@ Run run the NSI output then."
       (insert "================================================================================\n")
       (nsis-run-file nsis-run-file-name))))
 
-(defun nsis-finish-compile (&rest ignore)
+(defun nsis-finish-compile (&rest _ignore)
   "Finish Nsi Compilation."
   (with-current-buffer "*nsis*"
     (goto-char (point-max))
@@ -2062,10 +2067,8 @@ Run run the NSI output then."
 
 (defun nsis-last-line-indentation (&optional orphan)
   "Last line's indentation."
-  (let (ret)
-    (save-excursion
-      (nsis-goto-last-line 'ret orphan)
-      (symbol-value 'ret))))
+  (save-excursion
+    (nsis-goto-last-line orphan)))
 
 
 (defmacro nsis-set-indent-count (count)
@@ -2079,24 +2082,23 @@ Run run the NSI output then."
      (unless (= ,count 0)
        (setq ,count (- ,count 1))))))
 
-(defun nsis-goto-last-line (&optional li-q orphan)
-  "Go to the last line of code.
-- ignore continuation lines.
-- Set LI-Q to the =current-indentation= when requested."
+(defun nsis-goto-last-line (&optional orphan)
+  "Go to the last line of code, ignoring continuation lines.
+Return the `current-indentation' of the destination line."
   (if orphan
-      (progn
-        (let (count)
-          (nsis-goto-last-line li-q)
-          (setq count 1)
-          (nsis-set-indent-count count)
-          (while (and (not (save-excursion
-                             (beginning-of-line)
-                             (or (bobp)
-                                 (progn
-                                   (skip-chars-backward " \t\n")
-                                   (bobp))))) (not (= count 0)))
-            (nsis-goto-last-line li-q)
-            (nsis-set-indent-count count))))
+      (let (count result)
+        (setq result (nsis-goto-last-line))
+        (setq count 1)
+        (nsis-set-indent-count count)
+        (while (and (not (save-excursion
+                           (beginning-of-line)
+                           (or (bobp)
+                               (progn
+                                 (skip-chars-backward " \t\n")
+                                 (bobp))))) (not (= count 0)))
+          (setq result (nsis-goto-last-line))
+          (nsis-set-indent-count count))
+        result)
     (while (re-search-backward "^[ \t]*\n\\=" nil t))
     (forward-line -1)
     (beginning-of-line)
@@ -2112,25 +2114,28 @@ Run run the NSI output then."
     (while (looking-at "[ \t]*$")
       (forward-line -1)
       (beginning-of-line))
-    (when li-q
-      (set li-q (current-indentation)))))
+    (current-indentation)))
 
-(defun nsis-last-line-indent-line-p (&optional li-q is-id-q orphan-q)
-  "* Is the last line an indentation line?"
-  (let (ret)
+(defun nsis-last-line-indent-line-p (&optional check-id-p check-orphan-p)
+  "Is the last line an indentation line?
+Return a list (INDENT-P LI IS-ID ORPHAN) where INDENT-P is non-nil if the
+last line indicates indentation, LI is the indentation of that line, IS-ID
+is non-nil if the current line is an indent-deindent or end keyword, and
+ORPHAN is non-nil if the current line is an orphan keyword."
+  (let (ret li is-id orphan)
     (save-excursion
-      (when (or is-id-q orphan-q)
+      (when (or check-id-p check-orphan-p)
         (beginning-of-line))
-      (when is-id-q
-        (set is-id-q (or (looking-at (eval-when-compile (format "[ \t]*%s" nsis-indent-deindent-keywords)))
-                         (looking-at (eval-when-compile (format "[ \t]*%s" nsis-end-keywords))))))
-      (when orphan-q
-        (set orphan-q (looking-at (eval-when-compile (format "[ \t]*%s" nsis-indent-orphans)))))
-      (nsis-goto-last-line li-q)
+      (when check-id-p
+        (setq is-id (or (looking-at (eval-when-compile (format "[ \t]*%s" nsis-indent-deindent-keywords)))
+                        (looking-at (eval-when-compile (format "[ \t]*%s" nsis-end-keywords))))))
+      (when check-orphan-p
+        (setq orphan (looking-at (eval-when-compile (format "[ \t]*%s" nsis-indent-orphans)))))
+      (setq li (nsis-goto-last-line))
       (setq ret (looking-at (eval-when-compile (format "[ \t]*%s" nsis-start-keywords))))
       (unless ret
         (setq ret (looking-at (eval-when-compile (format "[ \t]*%s" nsis-indent-deindent-keywords))))))
-    (symbol-value 'ret)))
+    (list ret li is-id orphan)))
 
 (defun nsis-current-line-deindent-p ()
   "Current line a deindent?"
@@ -2140,7 +2145,7 @@ Run run the NSI output then."
      (looking-at (eval-when-compile (format "[ \t]*%s" nsis-end-keywords)))
      (looking-at (eval-when-compile (format "[ \t]*%s" nsis-indent-deindent-keywords))))))
 
-(defun nsis-font-lock-fontify-region-function (begin end)
+(defun nsis-font-lock-fontify-region-function (_begin _end)
   "Fontify.")
 
 ;; (defun nsis-comment-p ()
@@ -2151,14 +2156,14 @@ Run run the NSI output then."
   "* Are we in a multi-line comment?"
   (save-match-data (nsis-is-between (regexp-quote "/*") (regexp-quote "*/") t)))
 
-(defun nsis-is-between (first last &optional eof last-q)
-  "Return non-nil of the carat is between the first and last.
+(defun nsis-is-between (first last &optional eof)
+  "Return non-nil if point is between FIRST and LAST regexps.
 
-If eof is true, then the last position is:
+If EOF is true, then the last position is:
    (1) the position of the variable last
    (2) the position of the next variable first
    (3) the end of the buffer.
-If eof is nil, then the last position is:
+If EOF is nil, then the last position is:
    (1) the position of the next variable last.
 Returns first position."
   (let (
@@ -2200,10 +2205,7 @@ Returns first position."
               (if (> (point) first-posB)
                   (setq between nil)))))
     (when between
-      (setq between first-posB)
-      (when last-q
-        (set last-q last-posF)
-        ))
+      (setq between first-posB))
     between))
 
 (defun nsis-indent-line-function ()
@@ -2232,7 +2234,9 @@ Returns first position."
         ;; Do nothing.
         ;;(message "Multiline comment -- No indentation support")
         )
-       ((nsis-last-line-indent-line-p 'li 'is-id 'orphan) ;; Last line indicates we should indent
+       ((let ((result (nsis-last-line-indent-line-p t t)))
+          (setq li (nth 1 result) is-id (nth 2 result) orphan (nth 3 result))
+          (nth 0 result)) ;; Last line indicates we should indent
         ;;(message "indent: %s,%s,%s" li is-id orphan)
 
         (if (and is-id (not orphan)) ;; Actually indent/deindent line, keep same indentation.
@@ -2240,7 +2244,7 @@ Returns first position."
               (setq fli li))
           (if orphan
               (save-excursion
-                (nsis-goto-last-line 'li t)
+                (setq li (nsis-goto-last-line t))
                 (setq li (+ nsis-indent-level li))
                 (unless (= li curi) ;; Last line was an orphan too, keep the same indentation
                   (setq fli li)))
@@ -2280,8 +2284,8 @@ Returns first position."
 
 (add-to-list 'hs-special-modes-alist
              (list 'nsis-mode  nsis-hs-start nil "\\(?:[;#]\\|/[*]\\)"
-                   (lambda (arg) (nsis-forward-fold)) nil))
-(defun nsis-forward-fold (&rest arg)
+                   (lambda (_arg) (nsis-forward-fold)) nil))
+(defun nsis-forward-fold (&rest _arg)
   "* Used to go to next folded expression in NSIS."
   (interactive)
   (cond
