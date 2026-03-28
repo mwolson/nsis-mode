@@ -286,7 +286,7 @@
     )
   )
 
-(eval-when-compile
+(eval-and-compile
   (defvar nsis-syntax-function
     '(
       "Abort"
@@ -425,7 +425,7 @@
     "* nsis syntax function")
   )
 
-(eval-when-compile
+(eval-and-compile
   (defvar nsis-syntax-directive
     '(
       "!addincludedir"
@@ -467,7 +467,7 @@
     "NSIS syntax directive")
   )
 
-(eval-when-compile
+(eval-and-compile
   (defvar nsis-syntax-parameter
     '(
       "custom"
@@ -574,7 +574,7 @@
     )
   )
 
-(eval-when-compile
+(eval-and-compile
   (defvar nsis-syntax-parameter-slash
     '(
       "/BOM"
@@ -637,7 +637,7 @@
     "* nsis Parameters (w/slash)")
   )
 
-(eval-when-compile
+(eval-and-compile
   (defvar nsis-syntax-variable
     (append
      ;; Unlike what is in HM NIS editor, there are 20 registers, put
@@ -710,7 +710,7 @@
     )
   )
 
-(eval-when-compile
+(eval-and-compile
   (defvar nsis-syntax-callback
     '(
       ".onGUIEnd"
@@ -867,7 +867,7 @@
     )
   "NSD Macros.")
 
-(eval-when-compile
+(eval-and-compile
   (defvar nsis-syntax-nsd
     '(
       "Create"
@@ -888,7 +888,7 @@
     "NSD functions")
   )
 
-(eval-when-compile
+(eval-and-compile
   (defvar nsis-syntax-deprecated
     '(
       "CompareDLLVersions"
@@ -1203,7 +1203,7 @@
 ;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Imenu
 ;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(eval-when-compile
+(eval-and-compile
   (defvar nsis-imenu-generic-expression
     (reverse
      (list
@@ -2024,7 +2024,7 @@ Run run the NSI output then."
   ;;"* Regular expression of nsis beginning keywords"
   )
 
-(eval-when-compile
+(eval-and-compile
   (defvar nsis-indent-deindent-keywords
     (replace-regexp-in-string "@" "^[ \t]*[^-+!$0-9\n \t;#\"][^ \t\n]*?:[ \t]*\\($\\|[#;]\\|/[*].*?[*]/[ \t]*$\\|/[*].*?$\\)\\|^[ \t]*\"[^-+!$0-9\n \t;#][^ \t\n]*?:\"[ \t]*\\($\\|[#;]\\|/[*].*?[*]/[ \t]*$\\|/[*].*?$\\)"
                               (regexp-opt
@@ -2039,7 +2039,7 @@ Run run the NSI output then."
                                         ;"Regular expression of indent-deindent keywords statements for indent-deindent-keywords "
   )
 
-(eval-when-compile
+(eval-and-compile
   (defvar nsis-indent-orphans
     (replace-regexp-in-string "@" "^[ \t]*[^-+!$0-9\n \t;#\"][^ \t\n]*?:[ \t]*\\($\\|[#;]\\|/[*].*?[*]/[ \t]*$\\|/[*].*?$\\)\\|^[ \t]*\"[^-+!$0-9\n \t;#][^ \t\n]*?:\"[ \t]*\\($\\|[#;]\\|/[*].*?[*]/[ \t]*$\\|/[*].*?$\\)"
                               (regexp-opt
