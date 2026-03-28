@@ -191,7 +191,7 @@
 ;; Keywords from HM NIS Edit source Syntax.ini and the manuals.  Added logic lib
 ;; and other libraries.
 ;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(eval-when-compile
+(eval-and-compile
   (defvar nsis-syntax-reserved-word
     '(
       "AddBrandingImage"
@@ -1976,7 +1976,7 @@ Run run the NSI output then."
 ;; Indention function
 ;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(eval-when-compile
+(eval-and-compile
   (defvar nsis-end-keywords
         (replace-regexp-in-string "@" "\\<!insertmacro[ \t]+.*?END[ \t]*$"
                                   (replace-regexp-in-string "'" "\\>"
@@ -1998,7 +1998,7 @@ Run run the NSI output then."
   ;;"* Regular expression of nsis ending keywords"
   )
 
-(eval-when-compile
+(eval-and-compile
   (defvar nsis-start-keywords
         (replace-regexp-in-string "@" "\\<!insertmacro[ \t]+.*?BEGIN[ \t]*$"
                                   (replace-regexp-in-string "'" "\\>"
